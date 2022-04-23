@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { Remarkable } from '../lib/index';
+const util = require('util')
 
 var md = new Remarkable('full', { html: true, breaks: true });
 const output1 = md.parse(
@@ -8,6 +9,10 @@ const output1 = md.parse(
 );
 const output2 = md.parse(
   "Lorem ipsum <br foo=bar />dolor.",
+  {}
+);
+const output3 = md.parse(
+  "<div>\nLorem ipsum\n</div>\nfoo",
   {}
 );
 describe('self-closing inline html tags', function() {
@@ -57,3 +62,226 @@ describe('incomplete closing tag', function() {
     );
   });
 });
+describe('block html tag with content', function() {
+  it('should parse the html as nested structured data', () => {
+    assert.deepEqual(
+      output3,
+      [
+        {
+          type: 'htmlblock_open',
+          tag_name: 'div',
+          attrs: {},
+          level: 0,
+          lines: [ 0, 2 ]
+        },
+        { type: 'paragraph_open', tight: false, lines: [ 1, 2 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'Lorem ipsum',
+          level: 1,
+          lines: [ 1, 2 ],
+          children: [
+            {
+              content: "Lorem ipsum",
+              level: 0,
+              type: "text",
+            }
+          ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        { type: 'htmlblock_close', level: 0 },
+        { type: 'paragraph_open', tight: false, lines: [ 3, 4 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'foo',
+          level: 1,
+          lines: [ 3, 4 ],
+          children: [
+            {
+              content: "foo",
+              level: 0,
+              type: "text",
+            }
+          ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 }
+      ]
+    );
+  })
+})
+
+const output4 = md.parse(
+  "<div>\nLorem ipsum\n\ndoler sit\n</div>",
+  {}
+);
+describe('block html tag with content', function() {
+  it('should parse the html as nested structured data', () => {
+    // console.log(util.inspect(output4, {showHidden: false, depth: null, colors: true}));
+    assert.deepEqual(
+      output4,
+      [
+        {
+          type: 'htmlblock_open',
+          tag_name: 'div',
+          attrs: {},
+          level: 0,
+          lines: [ 0, 4 ]
+        },
+        { type: 'paragraph_open', tight: false, lines: [ 1, 2 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'Lorem ipsum',
+          level: 1,
+          lines: [ 1, 2 ],
+          children: [
+            {
+              content: "Lorem ipsum",
+              level: 0,
+              type: "text"
+            }
+          ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        { type: 'paragraph_open', tight: false, lines: [ 3, 4 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'doler sit',
+          level: 1,
+          lines: [ 3, 4 ],
+          children: [
+            {
+              content: "doler sit",
+              level: 0,
+              type: "text"
+            }
+          ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        { type: 'htmlblock_close', level: 0 }
+      ]
+    );
+  })
+})
+
+const output5 = md.parse(
+  "<div>Lorem ipsum</div>",
+  {}
+);
+describe('block html tag with content', function() {
+  it('should parse the html as nested structured data', () => {
+    assert.deepEqual(
+      output5[0]['children'],
+      [
+        {
+          type: 'htmltag_open',
+          tag_name: 'div',
+          attrs: {},
+          level: 0
+        },
+        { type: 'text', content: 'Lorem ipsum', level: 1 },
+        { type: 'htmltag_close', level: 0 },
+      ]
+    );
+  })
+})
+
+
+const output6 = md.parse(
+  "<div foo=\"bar\">\nLorem ipsum\n\n<section>\ndoler sit\n</section>\n</div>",
+  {}
+);
+describe('block html tag with content', function() {
+  it('should parse the html as nested structured data', () => {
+    assert.deepEqual(
+      output6,
+      [
+        {
+          type: 'htmlblock_open',
+          tag_name: 'div',
+          attrs: { foo: 'bar' },
+          level: 0,
+          lines: [ 0, 6 ]
+        },
+        {
+          type: 'paragraph_open',
+          tight: false,
+          lines: [ 1, 2 ],
+          level: 0
+        },
+        {
+          type: 'inline',
+          content: 'Lorem ipsum',
+          level: 1,
+          lines: [ 1, 2 ],
+          children: [ { type: 'text', content: 'Lorem ipsum', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        {
+          type: 'htmlblock_open',
+          tag_name: 'section',
+          attrs: {},
+          level: 0,
+          lines: [ 3, 5 ]
+        },
+        {
+          type: 'paragraph_open',
+          tight: false,
+          lines: [ 4, 5 ],
+          level: 0
+        },
+        {
+          type: 'inline',
+          content: 'doler sit',
+          level: 1,
+          lines: [ 4, 5 ],
+          children: [ { type: 'text', content: 'doler sit', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        { type: 'htmlblock_close', level: 0 },
+        { type: 'htmlblock_close', level: 0 },
+      ]
+    );
+  })
+})
+
+const output7 = md.parse(
+  "<details>\n<summary>Lorem</summary>\nIpsum\n</details>",
+  {}
+);
+describe('block html tag with content', function() {
+  it('should parse the html as nested structured data', () => {
+    assert.deepEqual(
+      output7,
+      [
+        {
+          type: 'htmlblock_open',
+          tag_name: 'details',
+          attrs: {},
+          level: 0,
+          lines: [ 0, 3 ]
+        },
+        {
+          type: 'inline',
+          content: '<summary>Lorem</summary>',
+          level: 1,
+          lines: [ 1, 2 ],
+          children: [
+            { type: 'htmltag_open', tag_name: 'summary', attrs: {}, level: 0 },
+            { type: 'text', content: 'Lorem', level: 1 },
+            { type: 'htmltag_close', level: 0 }
+          ]
+        },
+        { type: 'paragraph_open', tight: false, lines: [ 2, 3 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'Ipsum',
+          level: 1,
+          lines: [ 2, 3 ],
+          children: [ { type: 'text', content: 'Ipsum', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        { type: 'htmlblock_close', level: 0 }
+      ]
+    );
+  })
+})
