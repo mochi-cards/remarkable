@@ -250,6 +250,7 @@ const output7 = md.parse(
 );
 describe('block html tag with content', function() {
   it('should parse the html as nested structured data', () => {
+    // console.log(util.inspect(output7, {showHidden: false, depth: null, colors: true}));
     assert.deepEqual(
       output7,
       [
@@ -281,6 +282,47 @@ describe('block html tag with content', function() {
         },
         { type: 'paragraph_close', tight: false, level: 0 },
         { type: 'htmlblock_close', level: 0 }
+      ]
+    );
+  })
+})
+
+
+const output8 = md.parse(
+  "foo\n\n<br/>\n\nbar",
+  {}
+);
+describe('Deals with self-closing tags and void elements', function() {
+  it('note give children to <br> tags', () => {
+    // console.log(util.inspect(output8, {showHidden: false, depth: null, colors: true}));
+    assert.deepEqual(
+      output8,
+      [
+        { type: 'paragraph_open', tight: false, lines: [ 0, 1 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'foo',
+          level: 1,
+          lines: [ 0, 1 ],
+          children: [ { type: 'text', content: 'foo', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 },
+        {
+          type: 'inline',
+          content: '<br/>',
+          level: 1,
+          lines: [ 2, 3 ],
+          children: [ { type: 'htmltag', tag_name: 'br', attrs: {}, level: 0 } ]
+        },
+        { type: 'paragraph_open', tight: false, lines: [ 4, 5 ], level: 0 },
+        {
+          type: 'inline',
+          content: 'bar',
+          level: 1,
+          lines: [ 4, 5 ],
+          children: [ { type: 'text', content: 'bar', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 }
       ]
     );
   })
