@@ -289,7 +289,7 @@ describe('block html tag with content', function() {
 
 
 const output8 = md.parse(
-  "foo\n\n<br/>\n\nbar",
+  "foo\n\n<br/>\n\nbar\n\n<hr>foobar<hr>",
   {}
 );
 describe('Deals with self-closing tags and void elements', function() {
@@ -322,7 +322,18 @@ describe('Deals with self-closing tags and void elements', function() {
           lines: [ 4, 5 ],
           children: [ { type: 'text', content: 'bar', level: 0 } ]
         },
-        { type: 'paragraph_close', tight: false, level: 0 }
+        { type: 'paragraph_close', tight: false, level: 0 },
+        {
+          type: 'inline',
+          content: '<hr>foobar<hr>',
+          level: 1,
+          lines: [ 6, 7 ],
+          children: [
+            { type: 'htmltag', tag_name: 'hr', attrs: {}, level: 0 },
+            { type: 'text', content: 'foobar', level: 0 },
+            { type: 'htmltag', tag_name: 'hr', attrs: {}, level: 0 }
+          ]
+        }
       ]
     );
   })
