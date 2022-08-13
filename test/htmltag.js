@@ -338,3 +338,28 @@ describe('Deals with self-closing tags and void elements', function() {
     );
   })
 })
+
+
+const output10 = md.parse(
+  "<C-c>",
+  {}
+);
+describe('Make sure both open_tag regexs used in html_block are consistent', function() {
+  it('note give children to <br> tags', () => {
+    // console.log(util.inspect(output10, {showHidden: false, depth: null, colors: true}));
+    assert.deepEqual(
+      output10,
+      [
+        { type: 'paragraph_open', tight: false, lines: [ 0, 1 ], level: 0 },
+        {
+          type: 'inline',
+          content: '<C-c>',
+          level: 1,
+          lines: [ 0, 1 ],
+          children: [ { type: 'text', content: '<C-c>', level: 0 } ]
+        },
+        { type: 'paragraph_close', tight: false, level: 0 }
+      ]
+    );
+  })
+})
